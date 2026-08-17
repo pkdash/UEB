@@ -1,0 +1,22 @@
+# Build artifacts
+*.o
+*.obj
+uebpar
+uebgpu
+build/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+compile_commands.json
+
+# Editor/manual backup files
+*.bak
+*.bak[0-9]*
+*~
+
+# Local test data (extracted from TWDEF.zip)
+data/
+
+# OS cruft
+.DS_Store
