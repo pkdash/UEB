@@ -1,0 +1,62 @@
+{
+    "files.associations": {
+        "*.h": "cpp",
+        "iostream": "cpp",
+        "vector": "cpp",
+        "array": "cpp",
+        "string": "cpp",
+        "algorithm": "cpp",
+        "cmath": "cpp",
+        "netcdf.h": "c",
+        "iomanip": "cpp",
+        "fstream": "cpp",
+        "sstream": "cpp",
+        "cstring": "cpp",
+        "set": "cpp",
+        "mpi.h": "c"
+    },
+    "C_Cpp.default.cppStandard": "c++11",
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.default.compilerPath": "/usr/bin/mpicxx",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/**",
+        "/usr/local/include",
+        "/usr/include",
+        "/opt/homebrew/include"
+    ],
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.intelliSenseEngine": "default",
+    "editor.formatOnSave": false,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "editor.tabSize": 4,
+    "editor.detectIndentation": false,
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools",
+        "editor.tabSize": 4
+    },
+    "[c]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools",
+        "editor.tabSize": 4
+    },
+    "makefile.configurations": [
+        {
+            "name": "Default",
+            "makefilePath": "${workspaceFolder}/makefile"
+        },
+        {
+            "name": "GPU",
+            "makefilePath": "${workspaceFolder}/uebGpuMake"
+        }
+    ],
+    "search.exclude": {
+        "**/*.o": true,
+        "**/uebpar": true,
+        "**/uebgpu": true,
+        "**/uebparpio": true,
+        "**/*.zip": true
+    },
+    "files.exclude": {
+        "**/*.o": false
+    }
+}

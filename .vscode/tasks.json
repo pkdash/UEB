@@ -1,0 +1,174 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build UEB MPI (makefile)",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "-j4"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Clean UEB",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "clean"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build UEB GPU (CUDA)",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "-f",
+                "uebGpuMake",
+                "-j4"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Clean UEB GPU",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "-f",
+                "uebGpuMake",
+                "clean"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Rebuild UEB MPI",
+            "dependsOn": [
+                "Clean UEB",
+                "Build UEB MPI (makefile)"
+            ],
+            "dependsOrder": "sequence",
+            "group": "build"
+        },
+        {
+            "label": "Build UEB (WSL)",
+            "type": "shell",
+            "command": "wsl",
+            "args": [
+                "make",
+                "-j4"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "windows": {
+                "command": "wsl"
+            }
+        },
+        {
+            "label": "Build UEB (MinGW)",
+            "type": "shell",
+            "command": "C:\\msys64\\usr\\bin\\bash.exe",
+            "args": [
+                "-l",
+                "-c",
+                "cd '${workspaceFolder}' && make -j4"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Build UEB (CMake)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "${workspaceFolder}/build",
+                "--config",
+                "Release",
+                "-j4"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$msCompile",
+                "$gcc"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Configure CMake (Windows)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-S",
+                "${workspaceFolder}",
+                "-B",
+                "${workspaceFolder}/build",
+                "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Clean (WSL)",
+            "type": "shell",
+            "command": "wsl",
+            "args": [
+                "make",
+                "clean"
+            ],
+            "group": "build",
+            "windows": {
+                "command": "wsl"
+            }
+        },
+        {
+            "label": "Clean (MinGW)",
+            "type": "shell",
+            "command": "C:\\msys64\\usr\\bin\\bash.exe",
+            "args": [
+                "-l",
+                "-c",
+                "cd '${workspaceFolder}' && make clean"
+            ],
+            "group": "build"
+        }
+    ]
+}
