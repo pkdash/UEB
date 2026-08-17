@@ -1,0 +1,42 @@
+{
+    "name": "UEB (Ubuntu, MPI + parallel NetCDF)",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "workspaceFolder": "/workspaces/UEB",
+    "remoteUser": "vscode",
+    // Required for gdb to work reliably in a container: ptrace (breakpoints/stepping) is
+    // blocked by Docker's default seccomp profile without this.
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.makefile-tools",
+                "ms-vscode.cmake-tools",
+                "jeff-hykin.better-cpp-syntax",
+                "eamodio.gitlens",
+                "usernamehw.errorlens",
+                "streetsidesoftware.code-spell-checker"
+            ],
+            "settings": {
+                "C_Cpp.default.compilerPath": "/usr/bin/mpicxx",
+                "C_Cpp.default.cppStandard": "c++11",
+                "C_Cpp.default.cStandard": "c11",
+                "C_Cpp.default.includePath": [
+                    "${workspaceFolder}/**",
+                    "/opt/netcdf-parallel/include"
+                ]
+            }
+        }
+    },
+    // The bundled test dataset (TWDEF.zip) isn't extracted automatically anywhere else -
+    // do it once on container creation so it's ready to run against right away.
+    "postCreateCommand": "[ -d data/TWDEF ] || (mkdir -p data && unzip -q TWDEF.zip -d data)"
+}
