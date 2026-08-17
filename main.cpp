@@ -75,19 +75,19 @@ int main(int argc, char* argv[])
 	double intermStart_Time = 0.0, startTimeT = 0.0, TotalTime = 0.0, paramSite_Time = 0.0, inputTS_Time = 0.0, computeRun_Time = 0.0, outputWrite_Time = 0.0;
 	double TsReadTime = 0.0, TSStartTime, ComputeStartTime, ComputeTime = 0.0, OutWriteTime;
 
-	MPI::Init(argc, argv);
+	MPI_Init(&argc, &argv);
 	//how many processes
-	size = MPI::COMM_WORLD.Get_size(); //	MPI_Comm_size(MPI_COMM_WORLD,&size);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	//which rank is yours? 
-	rank = MPI::COMM_WORLD.Get_rank(); //_Comm_rank(MPI_COMM_WORLD,&rank);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	//cout << "\n rank "<< rank << " of "<< size << " processes has started\n" << endl;	
-	MPI::Intracomm worldComm = MPI::COMM_WORLD;
-	MPI::Info worldInfo = MPI::INFO_NULL;
+	MPI_Comm worldComm = MPI_COMM_WORLD;
+	MPI_Info worldInfo = MPI_INFO_NULL;
 	if (rank == 0)
 	{
 		//microsecond wall time: to time block of work
-		startTimeT = MPI::Wtime();
-		intermStart_Time = MPI::Wtime();
+		startTimeT = MPI_Wtime();
+		intermStart_Time = MPI_Wtime();
 		TsReadTime = 0.0;
 		ComputeTime = 0.0;
 	}
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 	{
 		if (rank == 0)
 			cout << "file not found exiting" << endl;
-		MPI::Finalize();
+		MPI_Finalize();
 		return 1;
 		//cin >> conFile;
 	}
@@ -146,9 +146,9 @@ int main(int argc, char* argv[])
 	}
 //broadcast ws values
 	//wsxcorArray = create2DArray_Contiguous_int(Nydim, Nxdim);
-	MPI::COMM_WORLD.Bcast(&dimlen1, 1, MPI::INT, 0);
-	MPI::COMM_WORLD.Bcast(&dimlen2, 1, MPI::INT, 0);
-	MPI::COMM_WORLD.Bcast(&wsfillVal, 1, MPI::INT, 0);
+	MPI_Bcast(&dimlen1, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	MPI_Bcast(&dimlen2, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	MPI_Bcast(&wsfillVal, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	if (rank != 0)
 	{
 		wsycorArray = new float[dimlen1];
@@ -159,9 +159,9 @@ int main(int argc, char* argv[])
 			wsArray[j] = new int[dimlen2];
 		*/
 	}
-	MPI::COMM_WORLD.Bcast(&wsycorArray[0], dimlen1, MPI::FLOAT, 0);
-	MPI::COMM_WORLD.Bcast(&wsxcorArray[0], dimlen2, MPI::FLOAT, 0);
-	MPI::COMM_WORLD.Bcast(&wsArray[0][0], dimlen1* dimlen2, MPI::INT, 0);
+	MPI_Bcast(&wsycorArray[0], dimlen1, MPI_FLOAT, 0, MPI_COMM_WORLD);
+	MPI_Bcast(&wsxcorArray[0], dimlen2, MPI_FLOAT, 0, MPI_COMM_WORLD);
+	MPI_Bcast(&wsArray[0][0], dimlen1* dimlen2, MPI_INT, 0, MPI_COMM_WORLD);
 
 	//aggregation zone info
 	float * wsArray1D = new float[dimlen1*dimlen2];
@@ -226,11 +226,11 @@ int main(int argc, char* argv[])
 					strsvArray[i].svArrayValues[j] = new float[dimlen2];
 				*/
 			}
-			MPI::COMM_WORLD.Bcast(&strsvArray[i].svArrayValues[0][0], dimlen1* dimlen2, MPI::FLOAT, 0);
+			MPI_Bcast(&strsvArray[i].svArrayValues[0][0], dimlen1* dimlen2, MPI_FLOAT, 0, MPI_COMM_WORLD);
 		}
 	}
-	paramSite_Time += (MPI::Wtime() - intermStart_Time);
-	intermStart_Time = MPI::Wtime();
+	paramSite_Time += (MPI_Wtime() - intermStart_Time);
+	intermStart_Time = MPI_Wtime();
 	//read input /forcing control file--all possible entries of input control have to be provided
 	readInputForcVars(inputconFile, strinpforcArray);
 	modelSpan = julian(ModelEndDate[0], ModelEndDate[1], ModelEndDate[2], ModelEndHour) - julian(ModelStartDate[0], ModelStartDate[1], ModelStartDate[2], ModelStartHour);
@@ -253,8 +253,8 @@ int main(int argc, char* argv[])
 			tsvarArray[it][1] = strinpforcArray[it].infdefValue;
 		}
 	}
-	inputTS_Time += (MPI::Wtime() - intermStart_Time);
-	intermStart_Time = MPI::Wtime();
+	inputTS_Time += (MPI_Wtime() - intermStart_Time);
+	intermStart_Time = MPI_Wtime();
 	//allocate memory for output array	
 	outvarArray = new float*[numOut];
 	for (int i = 0; i<numOut; i++)
@@ -299,8 +299,8 @@ int main(int argc, char* argv[])
 				aggoutvarArray[j][i][it] = 0.0;
 		}
 	}
-	paramSite_Time += (MPI::Wtime() - intermStart_Time);
-	intermStart_Time = MPI::Wtime();
+	paramSite_Time += (MPI_Wtime() - intermStart_Time);
+	intermStart_Time = MPI_Wtime();
 	
 	for (int icout = 0; icout < nncout; icout++)
 		retvalue = create3DNC_uebOutputs(ncOut[icout].outfName, (const char*)ncOut[icout].symbol, (const char*)ncOut[icout].units, tNameout, tUnitsout,
@@ -309,9 +309,9 @@ int main(int argc, char* argv[])
 	retvalue = create3DNC_uebAggregatedOutputs(aggoutputFile, aggOut, naggout, tNameout, tUnitsout, tlong_name, tcalendar, outtSteps, aggoutDimord, t_out, &out_fillVal,
 		watershedFile, wsvarName, wsycorName, wsxcorName, nZones, zName, z_ycor, z_xcor, worldComm, worldInfo);
 
-	outputWrite_Time += (MPI::Wtime() - intermStart_Time);
-	intermStart_Time = MPI::Wtime();
-	//MPI::COMM_WORLD.Barrier();	
+	outputWrite_Time += (MPI_Wtime() - intermStart_Time);
+	intermStart_Time = MPI_Wtime();
+	//MPI_Barrier(MPI_COMM_WORLD);	
 	int remLength = activeCells.size() % size;	
 	int cellIndx = -1;
 	for (irank = rank; irank < activeCells.size() - remLength; irank += size)
@@ -329,8 +329,8 @@ int main(int argc, char* argv[])
 			else
 				SiteState[is] = strsvArray[is].svdefValue;
 		}
-		paramSite_Time += (MPI::Wtime() - intermStart_Time);
-		intermStart_Time = MPI::Wtime();
+		paramSite_Time += (MPI_Wtime() - intermStart_Time);
+		intermStart_Time = MPI_Wtime();
 		for (int it = 0; it < 13; it++)
 		{
 			if (strinpforcArray[it].infType == 1)
@@ -363,14 +363,14 @@ int main(int argc, char* argv[])
 				}
 			}
 		}
-		inputTS_Time += (MPI::Wtime() - intermStart_Time);
-		intermStart_Time = MPI::Wtime();
+		inputTS_Time += (MPI_Wtime() - intermStart_Time);
+		intermStart_Time = MPI_Wtime();
 		/*cout << endl << "Tmin " << endl;
 		for (int tps = 0; tps < 100; tps++)
 			cout << "  " << tsvarArray[10][tps] << " ";*/
 		RUNUEB(tsvarArray, SiteState, parvalArray, outvarArray, ModelStartDate, ModelStartHour, ModelEndDate, ModelEndHour, ModelDt, ModelUTCOffset);
-		computeRun_Time += (MPI::Wtime() - intermStart_Time);
-		intermStart_Time = MPI::Wtime();
+		computeRun_Time += (MPI_Wtime() - intermStart_Time);
+		intermStart_Time = MPI_Wtime();
 		//write nc outputs
 		for (int icout = 0; icout < nncout; icout++)
 		{
@@ -418,8 +418,8 @@ int main(int argc, char* argv[])
 			for (int it = 0; it < outtSteps; it++)
 				aggoutvarArray[zoneid][iagout][it] += outvarArray[aggoutvarindx][outtStride*it];
 		}
-		outputWrite_Time += (MPI::Wtime() - intermStart_Time);
-		intermStart_Time = MPI::Wtime();
+		outputWrite_Time += (MPI_Wtime() - intermStart_Time);
+		intermStart_Time = MPI_Wtime();
 		//debug outputs
 		/*if (irank % outyStep == 0 && (jrank + xstrt) % outxStep == 0)
 		{
@@ -454,26 +454,29 @@ int main(int argc, char* argv[])
 		//write var values
 		retvalue = WriteTSto3DNC_Block((const char*)ncOut[icout].outfName, (const char*)ncOut[icout].symbol, outDimord, yIndxArr, xIndxArr, cellIndx, outtSteps, ncoutArray[icout], worldComm, worldInfo);               
 	}
-	outputWrite_Time += (MPI::Wtime() - intermStart_Time);
-	intermStart_Time = MPI::Wtime();	
+	outputWrite_Time += (MPI_Wtime() - intermStart_Time);
+	intermStart_Time = MPI_Wtime();	
 	//cout << "Process " << rank << " before final loop with rem Length " << remLength << endl;
-	//MPI::COMM_WORLD.Barrier();
+	//MPI_Barrier(MPI_COMM_WORLD);
 	if (remLength > 0)  //if there are remaining compute cells after even distribution 
 	{
 		int *remRanks = new int[remLength];
 		int leftBorder = activeCells.size() - remLength;
 		for (int ir = 0; ir < remLength; ir++)           // = leftBorder; ir < activeCells.size(); ir++)
 			remRanks[ir] = ir;                           // [ir - leftBorder] = ir;
-		MPI::Group worldGroup = MPI::COMM_WORLD.Get_group();
-		MPI::Group remGroup = worldGroup.Incl(remLength, remRanks);
-		MPI::Intracomm remComm = MPI::COMM_WORLD.Create(remGroup);
-		int newSize = -1;  //remComm.Get_size();
-		int newRank = 0;  //remComm.Get_rank();
+		MPI_Group worldGroup;
+		MPI_Comm_group(MPI_COMM_WORLD, &worldGroup);
+		MPI_Group remGroup;
+		MPI_Group_incl(worldGroup, remLength, remRanks, &remGroup);
+		MPI_Comm remComm;
+		MPI_Comm_create(MPI_COMM_WORLD, remGroup, &remComm);
+		int newSize = -1;
+		int newRank = 0;
 		//cout << " rank "<< rank << " of "<< size << " processes has started\n" << endl;	
 		if (rank < remLength)         //only for processes in the new comm group
 		{
-			newSize = remComm.Get_size();
-			newRank = remComm.Get_rank();
+			MPI_Comm_size(remComm, &newSize);
+			MPI_Comm_rank(remComm, &newRank);
 			//cout << " new rank of old process "<< rank << " is:  "<< newRank << endl;	
 			//track grid cell
 			uebCellY = activeCells[leftBorder + newRank].first;
@@ -485,8 +488,8 @@ int main(int argc, char* argv[])
 				else
 					SiteState[is] = strsvArray[is].svdefValue;
 			}
-			paramSite_Time += (MPI::Wtime() - intermStart_Time);
-		    intermStart_Time = MPI::Wtime();
+			paramSite_Time += (MPI_Wtime() - intermStart_Time);
+		    intermStart_Time = MPI_Wtime();
 			for (int it = 0; it < 13; it++)            //it < 13,          12.18.14
 		    {
 			    if (strinpforcArray[it].infType == 1)     // == 0
@@ -519,14 +522,14 @@ int main(int argc, char* argv[])
 					}
 				}
 			}
-			inputTS_Time += (MPI::Wtime() - intermStart_Time);
-			intermStart_Time = MPI::Wtime();
+			inputTS_Time += (MPI_Wtime() - intermStart_Time);
+			intermStart_Time = MPI_Wtime();
 			/*cout << endl << "Tmin " << endl;
 			for (int tps = 0; tps < 100; tps++)
 			cout << "  " << tsvarArray[10][tps] << " ";*/
 			RUNUEB(tsvarArray, SiteState, parvalArray, outvarArray, ModelStartDate, ModelStartHour, ModelEndDate, ModelEndHour, ModelDt, ModelUTCOffset);
-			computeRun_Time += (MPI::Wtime() - intermStart_Time);
-			intermStart_Time = MPI::Wtime();
+			computeRun_Time += (MPI_Wtime() - intermStart_Time);
+			intermStart_Time = MPI_Wtime();
 			//write nc outputs
 			for (int icout = 0; icout < nncout; icout++)
 			{
@@ -574,8 +577,8 @@ int main(int argc, char* argv[])
 				for (int it = 0; it < outtSteps; it++)
 					aggoutvarArray[zoneid][iagout][it] += outvarArray[aggoutvarindx][outtStride*it];
 			}
-			outputWrite_Time += (MPI::Wtime() - intermStart_Time);
-			intermStart_Time = MPI::Wtime();
+			outputWrite_Time += (MPI_Wtime() - intermStart_Time);
+			intermStart_Time = MPI_Wtime();
 			//debug outputs
 			/*if (irank % outyStep == 0 && (jrank + xstrt) % outxStep == 0)
 			{
@@ -608,7 +611,7 @@ int main(int argc, char* argv[])
 	//cout << "process " << rank << " completed computation" << endl;
 	for (int it = 0; it < outtSteps; it++)
 		totalAgg[it] = 0.0;
-	MPI::COMM_WORLD.Barrier();
+	MPI_Barrier(MPI_COMM_WORLD);
 	int rankrec = 0;               //receiver rank 
 	int totalZonecells = 1, zonValue = 0;
 	for (int izone = 0; izone < nZones; izone++)
@@ -616,15 +619,15 @@ int main(int argc, char* argv[])
 		rankrec = izone*size / nZones;
 		//cout << "process " << rank << " before first reduce to rank: " << rankrec << endl;
 		zonValue = ZonesArr[izone];
-		MPI::COMM_WORLD.Reduce(&zonValue, &totalZonecells, 1, MPI::INT, MPI::SUM, rankrec);
+		MPI_Reduce(&zonValue, &totalZonecells, 1, MPI_INT, MPI_SUM, rankrec, MPI_COMM_WORLD);
 		//cout<<"process "<<rank<<" total zone cells "<<totalZonecells<<endl;
 		if (totalZonecells < 1)
 			totalZonecells = 1;
 		for (int iagout = 0; iagout < naggout; iagout++)
 		{
 			//cout << "process " << rank << " before reduce of output " << iagout << endl;
-			//if (rank == rankrec) MPI::COMM_WORLD.Reduce(MPI::IN_PLACE, aggoutvarArray[izone][iagout],outtSteps, MPI::FLOAT, MPI::SUM, rankrec); else 
-			MPI::COMM_WORLD.Reduce(aggoutvarArray[izone][iagout], totalAgg, outtSteps, MPI::FLOAT, MPI::SUM, rankrec);
+			//if (rank == rankrec) MPI_Reduce(MPI_IN_PLACE, aggoutvarArray[izone][iagout],outtSteps, MPI_FLOAT, MPI_SUM, rankrec, MPI_COMM_WORLD); else 
+			MPI_Reduce(aggoutvarArray[izone][iagout], totalAgg, outtSteps, MPI_FLOAT, MPI_SUM, rankrec, MPI_COMM_WORLD);
 			//cout << "process " << rank << " waiting for writing" << endl;
 			//#_12.28.14 aggregation operation needs defining
 			if (rank == rankrec)
@@ -638,9 +641,9 @@ int main(int argc, char* argv[])
 			}
 		}
 	}
-	outputWrite_Time += (MPI::Wtime() - intermStart_Time);
-	intermStart_Time = MPI::Wtime();
-	//MPI::COMM_WORLD.Barrier();
+	outputWrite_Time += (MPI_Wtime() - intermStart_Time);
+	intermStart_Time = MPI_Wtime();
+	//MPI_Barrier(MPI_COMM_WORLD);
 	//cout<<"Process "<<rank<<" starting deallocating memory"<<endl;	
 
 	//deallocate memory ====#_*_#______Needs revisiting; some of the arrays are not deleted 6.23.13
@@ -694,14 +697,14 @@ int main(int argc, char* argv[])
 	/*for(int k=0 ;k<numOut; k++)
 		delete[] outvarArray[k];
 	delete []outvarArray; */
-	paramSite_Time += (MPI::Wtime() - intermStart_Time);
-	intermStart_Time = MPI::Wtime();
+	paramSite_Time += (MPI_Wtime() - intermStart_Time);
+	intermStart_Time = MPI_Wtime();
 	cout << "Process " << rank << " finished" << endl;
 	fflush(stdout);	
-	MPI::COMM_WORLD.Barrier();
+	MPI_Barrier(MPI_COMM_WORLD);
 	if (rank == 0)
 	{
-		TotalTime = MPI::Wtime() - startTimeT;                   //(float)1000*(endTimeT - startTimeT)/CLOCKS_PER_SEC;
+		TotalTime = MPI_Wtime() - startTimeT;                   //(float)1000*(endTimeT - startTimeT)/CLOCKS_PER_SEC;
 		cout << "Time in seconds" << endl;
 		cout << "Reading param  site state input control:  " << paramSite_Time << endl;
 		cout << "Reading input TS txt arrays:  " << TsReadTime << endl;
@@ -713,7 +716,7 @@ int main(int argc, char* argv[])
 		fflush(stdout);
 	}
 exitlab:
-	MPI::Finalize();
+	MPI_Finalize();
 	//getchar();
 	return 0;
 }

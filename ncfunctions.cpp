@@ -2,7 +2,7 @@
 #include "uebpgdecls.h"
 #include <netcdf_par.h>
 //writes the 1D array (TS values) at specified location in the netcdf
-int WriteTSto3DNC(const char* FileName, const char* VarName, int dimOrd, int y_dim, int x_dim,int Nt_dim,  float* var_inp, MPI::Intracomm inpComm, MPI::Info inpInfo)  //ydim, xdim =the coordinate point the data to be written; Nt_dim =the length of the TS
+int WriteTSto3DNC(const char* FileName, const char* VarName, int dimOrd, int y_dim, int x_dim,int Nt_dim,  float* var_inp, MPI_Comm inpComm, MPI_Info inpInfo)  //ydim, xdim =the coordinate point the data to be written; Nt_dim =the length of the TS
 {  
 	// IDs for the netCDF file, dimensions, and variables. 
 	int ncid = 0, y_dimid = 0, x_dimid = 0, t_dimid = 0; 
@@ -72,7 +72,7 @@ int WriteTSto3DNC(const char* FileName, const char* VarName, int dimOrd, int y_d
 	return 0;
 }
 //writes multiple 1D arrays (TS values) at specified locations in the netcdf
-int WriteTSto3DNC_Block(const char* FileName, const char* VarName, int dimOrd, int *YindArr, int *XindArr, int bSize, int Nt_dim, float** var_inp, MPI::Intracomm inpComm, MPI::Info inpInfo)  //ydim, xdim =the coordinate point the data to be written; Nt_dim =the length of the TS
+int WriteTSto3DNC_Block(const char* FileName, const char* VarName, int dimOrd, int *YindArr, int *XindArr, int bSize, int Nt_dim, float** var_inp, MPI_Comm inpComm, MPI_Info inpInfo)  //ydim, xdim =the coordinate point the data to be written; Nt_dim =the length of the TS
 {
 	// IDs for the netCDF file, dimensions, and variables. 
 	int ncid = 0, y_dimid = 0, x_dimid = 0, t_dimid = 0;
@@ -195,7 +195,7 @@ int Write_uebaggTS_toNC(const char* FileName, const char* VarName, int dimOrd, i
 	return 0;
 }
 //aggregate outputs at specified zone in the netcdf in parallel 
-int Write_uebaggTS_toNC_par(const char* FileName, const char* VarName, int dimOrd, int z_dim, int Nt_dim, float* var_inp, MPI::Intracomm inpComm, MPI::Info inpInfo)
+int Write_uebaggTS_toNC_par(const char* FileName, const char* VarName, int dimOrd, int z_dim, int Nt_dim, float* var_inp, MPI_Comm inpComm, MPI_Info inpInfo)
 {
 	// IDs for the netCDF file, dimensions, and variables. 
 	int ncid = 0, y_dimid = 0, x_dimid = 0, t_dimid = 0;
@@ -248,7 +248,7 @@ int Write_uebaggTS_toNC_par(const char* FileName, const char* VarName, int dimOr
 }
 //creates 3D netcdf in PARALLEL mode, and stores dimension variables for UEB aggregated outputs; some attributes are copied from the watershed netCDF
 int create3DNC_uebAggregatedOutputs(const char* FileName, aggOutput *aggOut, int naggOut, const char* tName, const char* tUnits, const char* tlong_name, const char* tcalendar, int Nt_dim, int dimOrd,
-	float* t_inp, float *fillVal, const char* ws_FileName, const char* ws_VarName, const char* yName, const char* xName, int nZones, const char * zName, float* y_inp, float* x_inp,  MPI::Intracomm inpComm, MPI::Info inpInfo)
+	float* t_inp, float *fillVal, const char* ws_FileName, const char* ws_VarName, const char* yName, const char* xName, int nZones, const char * zName, float* y_inp, float* x_inp,  MPI_Comm inpComm, MPI_Info inpInfo)
 {	
 	//ids for variable, axes,...
 	int retncval = 0, ncid = 0, pvarid = 0, pxid = 0, pyid = 0;
@@ -401,7 +401,7 @@ int create3DNC_uebAggregatedOutputs(const char* FileName, aggOutput *aggOut, int
 //creates 3D netcdf and stores dimension variables for a given UEB output; called once for a given output netcdf 
 //attributes are copied from the 2D (watershed) netCDF which the 3D netCDF spatial dimension follow
 int create3DNC_uebOutputs(const char* FileName, const char* VarName, const char *varUnits, const char* tName, const char* tUnits, const char* tlong_name,
-	const char* tcalendar, int Nt_dim, int dimOrd, float* t_inp, float *fillVal, const char* ws_FileName, const char* ws_VarName, const char* yName, const char* xName, MPI::Intracomm inpComm, MPI::Info inpInfo)
+	const char* tcalendar, int Nt_dim, int dimOrd, float* t_inp, float *fillVal, const char* ws_FileName, const char* ws_VarName, const char* yName, const char* xName, MPI_Comm inpComm, MPI_Info inpInfo)
 {	
 	//const char* yUnits, const char* xUnits;
 	float* y_inp;
@@ -611,7 +611,7 @@ int create3DNC_uebOutputs(const char* FileName, const char* VarName, const char 
 
 //creates 3D netcdf and stores dimension variables; called once for a given output netcdf 
 int Create3DNC(const char* FileName, const char* VarName, const char *varUnits,  const char* tName,  const char* yName, const char* xName, const char* tUnits,
-	const char* yUnits, const char* xUnits, int Nt_dim, int Ny_dim, int Nx_dim, int dimOrd, float* t_inp, float* y_inp, float* x_inp, float* fillVal, MPI::Intracomm inpComm, MPI::Info inpInfo)
+	const char* yUnits, const char* xUnits, int Nt_dim, int Ny_dim, int Nx_dim, int dimOrd, float* t_inp, float* y_inp, float* x_inp, float* fillVal, MPI_Comm inpComm, MPI_Info inpInfo)
 {  
 	// IDs for the netCDF file, dimensions, and variables. 
 	int ncid = 0, y_dimid = 0, x_dimid = 0, t_dimid = 0; 
@@ -723,7 +723,7 @@ int Create3DNC(const char* FileName, const char* VarName, const char *varUnits, 
 
 //This one creates and stores array passed to it at once
 int Write3DNC(const char* FileName, const char* VarName, const char *varUnits,  const char* tName,  const char* yName, const char* xName, const char* tUnits,  const char* yUnits, const char* xUnits, 
-				int Nt_dim, int Ny_dim, int Nx_dim, int dimOrd, float* t_inp, float* y_inp, float* x_inp, float*** var_inp, MPI::Intracomm inpComm, MPI::Info inpInfo)// int &t_dimid, int &y_dimid, int &x_dimid) //time, y, x
+				int Nt_dim, int Ny_dim, int Nx_dim, int dimOrd, float* t_inp, float* y_inp, float* x_inp, float*** var_inp, MPI_Comm inpComm, MPI_Info inpInfo)// int &t_dimid, int &y_dimid, int &x_dimid) //time, y, x
 {  
 	// IDs for the netCDF file, dimensions, and variables. 
 	int ncid = 0, y_dimid = 0, x_dimid = 0, t_dimid = 0; 
@@ -832,7 +832,7 @@ int Write3DNC(const char* FileName, const char* VarName, const char *varUnits,  
 }
 //read 3d nc to contiguous array;  y,x,time coordinate names are same as index names
 int read3DNC_Contiguous(const char* FILE_NAME, const char* VAR_NAME, const char* tcor_NAME, const char* ycor_NAME, const char* xcor_NAME,
-	float* tcorvar, float* ycorvar, float* xcorvar, size_t &Ntdim, size_t &Nydim, size_t &Nxdim, float*** &pvar_in, MPI::Intracomm inpComm, MPI::Info inpInfo)
+	float* tcorvar, float* ycorvar, float* xcorvar, size_t &Ntdim, size_t &Nydim, size_t &Nxdim, float*** &pvar_in, MPI_Comm inpComm, MPI_Info inpInfo)
 {
 	//ids for variable, axes,...
 	int retncval = 0, ncid = 0, pvarid = 0, pxid = 0, pyid = 0, ptid = 0, ndims = 0; 
@@ -919,7 +919,7 @@ int read3DNC_Contiguous(const char* FILE_NAME, const char* VAR_NAME, const char*
 }
 
 int read3DNC(const char* FILE_NAME, const char* VAR_NAME, const char* xcor_NAME, const char* ycor_NAME, const char* tcor_NAME, 
-                    float* xcorvar, float* ycorvar, float* tcorvar, float*** pvar_in, MPI::Intracomm inpComm, MPI::Info inpInfo)
+                    float* xcorvar, float* ycorvar, float* tcorvar, float*** pvar_in, MPI_Comm inpComm, MPI_Info inpInfo)
 {
 	//ids for variable, axes,...
 	int retncval = 0, ncid = 0, pvarid = 0, pxid = 0, pyid = 0, ptid = 0, ndims = 0; 
@@ -1014,7 +1014,7 @@ int read3DNC(const char* FILE_NAME, const char* VAR_NAME, const char* xcor_NAME,
 }
 //function to read multiple blocks of single column/rod along time dimension from 3D netcdf file, for given y , x coordinate arrays
 int readNC_TS_Block(const char* FILE_NAME, const char* VAR_NAME, const char* tcor_NAME, const char* ycor_NAME, const char* xcor_NAME,
-	float** &pvar_in,  int &nrecords, MPI::Intracomm inpComm, MPI::Info inpInfo, int *YindArr, int *XindArr, int bSize) // /*float* &tcorvar, int ydim, int xdim, */ int tIndx) 
+	float** &pvar_in,  int &nrecords, MPI_Comm inpComm, MPI_Info inpInfo, int *YindArr, int *XindArr, int bSize) // /*float* &tcorvar, int ydim, int xdim, */ int tIndx) 
 {
 	//float* pvarin_temp = NULL;
 	//ids for variable, axes,...
@@ -1088,7 +1088,7 @@ int readNC_TS_Block(const char* FILE_NAME, const char* VAR_NAME, const char* tco
 
 //function to read single column/rod along time dimension from 3D netcdf file, for given y , x coordinates
 int readNC_TS(const char* FILE_NAME, const char* VAR_NAME, const char* tcor_NAME, const char* ycor_NAME,const char* xcor_NAME,
-	float* &pvar_in, float* &tcorvar, int ydim, int xdim, int &nrecords, MPI::Intracomm inpComm, MPI::Info inpInfo) //, int xstride) //double* tcorvar, double*** pvar_in)
+	float* &pvar_in, float* &tcorvar, int ydim, int xdim, int &nrecords, MPI_Comm inpComm, MPI_Info inpInfo) //, int xstride) //double* tcorvar, double*** pvar_in)
 {
 	//6.24.14
 	int xdimindx = 1;
@@ -1161,7 +1161,7 @@ int readNC_TS(const char* FILE_NAME, const char* VAR_NAME, const char* tcor_NAME
 	return 0;
 }
 
-int read2DNC(const char* FILE_NAME, const char* VAR_NAME, float** &pvar_in, MPI::Intracomm inpComm, MPI::Info inpInfo)
+int read2DNC(const char* FILE_NAME, const char* VAR_NAME, float** &pvar_in, MPI_Comm inpComm, MPI_Info inpInfo)
 {
 	//ids for variable, axes,...
 	int retncval = 0, ncid = 0, pvarid = 0; // pxid = 0, pyid = 0, ndims = 0; 
@@ -1302,7 +1302,7 @@ int read2DNC(const char* FILE_NAME, const char* VAR_NAME, float**& pvar_in)
 }
 //read watershed file
 int readwsncFile(const char* FILE_NAME, const char* VAR_NAME, const char* ycor_NAME,  
-	const char* xcor_NAME, float* &ycorvar, float* &xcorvar, int** &pvar_in, int &ydim, int &xdim, int &fillVal, MPI::Intracomm inpComm, MPI::Info inpInfo)       //, std::set<int> zValues,  float * z_ycor, float *z_xcor)
+	const char* xcor_NAME, float* &ycorvar, float* &xcorvar, int** &pvar_in, int &ydim, int &xdim, int &fillVal, MPI_Comm inpComm, MPI_Info inpInfo)       //, std::set<int> zValues,  float * z_ycor, float *z_xcor)
 {
 	//ids for variable, axes,...
 	int retncval = 0, ncid = 0, pvarid = 0, pxid = 0, pyid = 0, ndims = 0; 
@@ -1485,7 +1485,7 @@ int readwsncFile(const char* FILE_NAME, const char* VAR_NAME, const char* ycor_N
 }
 
 int Write3DNC(const char* FILE_NAME, const char* VAR_NAME, const char* xcor_NAME, 
-	const char* ycor_NAME, const char* tcor_NAME, float* xcorvar, float* ycorvar, float* tcorvar, float*** pvar_out, MPI::Intracomm inpComm, MPI::Info inpInfo)
+	const char* ycor_NAME, const char* tcor_NAME, float* xcorvar, float* ycorvar, float* tcorvar, float*** pvar_out, MPI_Comm inpComm, MPI_Info inpInfo)
 {   
 	//ids for variable, axes,...
 	int retncval = 0, ncid = 0, pvarid = 0 , pxvarid = 0, pyvarid = 0, ptvarid = 0, pxid = 0, pyid = 0, ptid = 0, ndims = 0; 
