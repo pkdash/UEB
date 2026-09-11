@@ -1,10 +1,18 @@
 # UEB VSCode Setup for Windows Development
 
+> **⚠️ Prefer the Dev Container setup:** For most Windows development, use the
+> [Dev Container setup in ueb-vscode-setup.md](ueb-vscode-setup.md#dev-container-setup-docker---recommended)
+> instead of the approaches in this document. It provides an identical, reproducible Ubuntu
+> environment (MPI, gdb, and parallel NetCDF/HDF5 prebuilt) with no native toolchain
+> installation — Docker Desktop with its WSL2 backend is the only prerequisite. The approaches
+> below remain relevant if you can't run Docker, need the **GPU/CUDA build (`uebgpu`)**, or
+> specifically want a native Windows build.
+
 ## Overview
 
-This guide provides Windows-specific instructions for setting up the UEB (Utah Energy Balance Snowmelt Model) development environment in VSCode. Windows developers have three main approaches:
+This guide provides Windows-specific instructions for setting up the UEB (Utah Energy Balance Snowmelt Model) development environment in VSCode. For native (non-container) Windows development, there are three main approaches:
 
-1. **WSL2 (Windows Subsystem for Linux)** - Recommended ⭐
+1. **WSL2 (Windows Subsystem for Linux)** - Recommended for native setup ⭐
 2. **Visual Studio with MSVC** - Native Windows
 3. **MinGW-w64** - Unix-like toolchain on Windows
 

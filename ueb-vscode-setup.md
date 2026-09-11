@@ -111,6 +111,19 @@ package differences, etc.).
 ### Dev Container Prerequisites
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+  - **On Windows:** Docker Desktop runs Linux containers (like this one) via its WSL2 backend,
+    so WSL2 must be installed first. Open PowerShell as Administrator and run:
+
+    ```powershell
+    # Enable WSL2 (installs WSL with Ubuntu by default; restart if prompted)
+    wsl --install
+
+    # If WSL was already installed, ensure version 2 is the default
+    wsl --set-default-version 2
+    ```
+
+    You only need the WSL2 installation itself — no toolchain inside WSL2, since the container
+    provides everything.
 - VS Code extension: **Dev Containers** (`ms-vscode-remote.remote-containers`)
 
 ### Dev Container Steps
