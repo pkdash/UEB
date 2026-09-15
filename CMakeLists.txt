@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(UEB CXX)
+project(UEB C CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -7,16 +7,39 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Export compile commands for VSCode IntelliSense
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Parallel NetCDF/HDF5 built from source (devcontainer: /opt/netcdf-parallel).
+# The Dockerfile sets NCPREFIX; use it to locate the from-source install which
+# only ships a pkg-config file (no netCDFConfig.cmake / FindnetCDF.cmake).
+set(UEB_USE_SOURCE_NETCDF FALSE)
+if(UNIX AND DEFINED ENV{NCPREFIX})
+    set(UEB_USE_SOURCE_NETCDF TRUE)
+    set(NCPREFIX $ENV{NCPREFIX})
+    list(APPEND CMAKE_PREFIX_PATH ${NCPREFIX})
+    set(ENV{PKG_CONFIG_PATH} "${NCPREFIX}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+    set(HDF5_ROOT ${NCPREFIX})
+    set(ZLIB_ROOT ${NCPREFIX})
+    message(STATUS "Using NCPREFIX: ${NCPREFIX}")
+endif()
+
 # Find MPI
 find_package(MPI REQUIRED)
 include_directories(${MPI_CXX_INCLUDE_DIRS})
 
 # Find NetCDF
 # vcpkg provides netCDF with CONFIG mode
-find_package(netCDF CONFIG)
+find_package(netCDF CONFIG QUIET)
 if(NOT netCDF_FOUND)
-    # Fallback to MODULE mode for manual installations
-    find_package(netCDF REQUIRED)
+    # Fallback to pkg-config (used by the from-source parallel build)
+    if(UEB_USE_SOURCE_NETCDF)
+        find_package(PkgConfig QUIET)
+        if(PkgConfig_FOUND)
+            pkg_check_modules(netCDF netcdf)
+        endif()
+    endif()
+    if(NOT netCDF_FOUND)
+        # Last resort: manual installation with a FindnetCDF.cmake module
+        find_package(netCDF REQUIRED)
+    endif()
 endif()
 
 # Find HDF5
@@ -55,14 +78,14 @@ set(UEB_SOURCES
 add_executable(uebpar ${UEB_SOURCES})
 
 # Include directories
-target_include_directories(uebpar PRIVATE 
+target_include_directories(uebpar PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${MPI_CXX_INCLUDE_DIRS}
 )
 
 # Link libraries
-target_link_libraries(uebpar 
-    PRIVATE 
+target_link_libraries(uebpar
+    PRIVATE
     MPI::MPI_CXX
     ${HDF5_LIBRARIES}
     ${HDF5_HL_LIBRARIES}
@@ -76,11 +99,15 @@ if(TARGET netCDF::netcdf)
 else()
     target_link_libraries(uebpar PRIVATE ${netCDF_LIBRARIES})
     target_include_directories(uebpar PRIVATE ${netCDF_INCLUDE_DIRS})
+    # pkg-config path: add library search dirs (e.g. /opt/netcdf-parallel/lib)
+    if(netCDF_LIBRARY_DIRS)
+        target_link_directories(uebpar PRIVATE ${netCDF_LIBRARY_DIRS})
+    endif()
 endif()
 
 # Compiler definitions
 if(MSVC)
-    target_compile_definitions(uebpar PRIVATE 
+    target_compile_definitions(uebpar PRIVATE
         _CRT_SECURE_NO_WARNINGS
         NOMINMAX
         _USE_MATH_DEFINES
@@ -101,7 +128,7 @@ option(BUILD_GPU_VERSION "Build GPU version with CUDA" OFF)
 
 if(BUILD_GPU_VERSION)
     enable_language(CUDA)
-    
+
     set(UEB_GPU_SOURCES
         gpumain.cpp
         gpucanopy.cpp
@@ -113,17 +140,17 @@ if(BUILD_GPU_VERSION)
         gpuuebdecls.cpp
         gpuuebinputs.cpp
     )
-    
+
     add_executable(uebgpu ${UEB_GPU_SOURCES})
-    
-    target_include_directories(uebgpu PRIVATE 
+
+    target_include_directories(uebgpu PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${MPI_CXX_INCLUDE_DIRS}
         ${CUDA_INCLUDE_DIRS}
     )
-    
-    target_link_libraries(uebgpu 
-        PRIVATE 
+
+    target_link_libraries(uebgpu
+        PRIVATE
         MPI::MPI_CXX
         ${HDF5_LIBRARIES}
         ${HDF5_HL_LIBRARIES}
@@ -132,22 +159,22 @@ if(BUILD_GPU_VERSION)
         ${CUDA_LIBRARIES}
         cudart
     )
-    
+
     if(TARGET netCDF::netcdf)
         target_link_libraries(uebgpu PRIVATE netCDF::netcdf)
     else()
         target_link_libraries(uebgpu PRIVATE ${netCDF_LIBRARIES})
         target_include_directories(uebgpu PRIVATE ${netCDF_INCLUDE_DIRS})
     endif()
-    
+
     # CUDA architecture
     set_target_properties(uebgpu PROPERTIES
         CUDA_SEPARABLE_COMPILATION ON
         CUDA_ARCHITECTURES "52;61;75;86"
     )
-    
+
     if(MSVC)
-        target_compile_definitions(uebgpu PRIVATE 
+        target_compile_definitions(uebgpu PRIVATE
             _CRT_SECURE_NO_WARNINGS
             NOMINMAX
             _USE_MATH_DEFINES
