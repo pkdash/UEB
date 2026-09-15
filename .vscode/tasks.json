@@ -108,6 +108,23 @@
             }
         },
         {
+            "label": "Configure CMake",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-S",
+                "${workspaceFolder}",
+                "-B",
+                "${workspaceFolder}/build"
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
             "label": "Build UEB (CMake)",
             "type": "shell",
             "command": "cmake",
@@ -118,6 +135,10 @@
                 "Release",
                 "-j4"
             ],
+            "dependsOn": [
+                "Configure CMake"
+            ],
+            "dependsOrder": "sequence",
             "group": "build",
             "problemMatcher": [
                 "$msCompile",
