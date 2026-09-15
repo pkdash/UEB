@@ -70,7 +70,7 @@
             "group": "build"
         },
         {
-            "label": "Build UEB (WSL)",
+            "label": "Build UEB (Windows: WSL)",
             "type": "shell",
             "command": "wsl",
             "args": [
@@ -90,7 +90,7 @@
             }
         },
         {
-            "label": "Build UEB (MinGW)",
+            "label": "Build UEB (Windows: MinGW)",
             "type": "shell",
             "command": "C:\\msys64\\usr\\bin\\bash.exe",
             "args": [
@@ -168,7 +168,7 @@
             }
         },
         {
-            "label": "Clean (WSL)",
+            "label": "Clean UEB (Windows: WSL)",
             "type": "shell",
             "command": "wsl",
             "args": [
@@ -181,7 +181,7 @@
             }
         },
         {
-            "label": "Clean (MinGW)",
+            "label": "Clean UEB (Windows: MinGW)",
             "type": "shell",
             "command": "C:\\msys64\\usr\\bin\\bash.exe",
             "args": [
